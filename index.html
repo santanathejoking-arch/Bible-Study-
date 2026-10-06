@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Bible Study & Community</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --light: #f8f9fa;
+            --dark: #333;
+            --border: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .share-banner {
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .share-banner:hover {
+            background: #1f618d;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card h2 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1f618d;
+        }
+
+        .feed {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .post {
+            background: var(--light);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+            position: relative;
+        }
+
+        .post .author {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .post .timestamp {
+            font-size: 0.8rem;
+            color: #777;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .post .content {
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Online Bible Study Fellowship</h1>
+        <p>A space for community, study, and prayer.</p>
+    </header>
+
+    <div class="share-banner" onclick="shareWebsite()">
+        🔗 Click here to copy shareable link for your friends!
+    </div>
+
+    <div class="container">
+        
+        <!-- Discussion & Thoughts Section -->
+        <div class="card">
+            <h2>💬 Scripture Thoughts & Discussion</h2>
+            <form id="chat-form">
+                <div class="form-group">
+                    <input type="text" id="chat-name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="chat-msg" placeholder="Share a thought, insight, or verse breakdown..." required></textarea>
+                </div>
+                <button type="submit">Post Thought</button>
+            </form>
+            <div class="feed" id="chat-feed">
+                <!-- Dynamic posts go here -->
+            </div>
+        </div>
+
+        <!-- Prayers & Requests Section -->
+        <div class="card">
+            <h2>🙏 Prayers & Requests</h2>
+            <form id="prayer-form">
+                <div class="form-group">
+                    <input type="text" id="prayer-name" placeholder="Your Name (or Anonymous)" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="prayer-msg" placeholder="Share a prayer request or praise report..." required></textarea>
+                </div>
+                <button type="submit">Share Request</button>
+            </form>
+            <div class="feed" id="prayer-feed">
+                <!-- Dynamic prayers go here -->
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Online Bible Study. Built for fellowship.</p>
+    </footer>
+
+    <script>
+        // Load data from LocalStorage on startup
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPosts('chats', 'chat-feed');
+            loadPosts('prayers', 'prayer-feed');
+        });
+
+        // Handle Chat Submission
+        document.getElementById('chat-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('chat-name').value;
+            const content = document.getElementById('chat-msg').value;
+            
+            saveAndRenderPost('chats', 'chat-feed', name, content);
+            document.getElementById('chat-msg').value = '';
+        });
+
+        // Handle Prayer Submission
+        document.getElementById('prayer-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('prayer-name').value;
+            const content = document.getElementById('prayer-msg').value;
+            
+            saveAndRenderPost('prayers', 'prayer-feed', name, content);
+            document.getElementById('prayer-msg').value = '';
+        });
+
+        function saveAndRenderPost(storageKey, feedId, name, content) {
+            const timestamp = new Date().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+            const postObj = { name, content, timestamp };
+
+            // Get existing, push new, save back
+            let posts = JSON.parse(localStorage.getItem(storageKey)) || [];
+            posts.unshift(postObj); // Add to top
+            localStorage.setItem(storageKey, JSON.stringify(posts));
+
+            renderFeed(storageKey, feedId);
+        }
+
+        function loadPosts(storageKey, feedId) {
+            renderFeed(storageKey, feedId);
+        }
+
+        function renderFeed(storageKey, feedId) {
+            const feedElement = document.getElementById(feedId);
+            const posts = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            feedElement.innerHTML = '';
+            if (posts.length === 0) {
+                feedElement.innerHTML = '<p style="color: #777; text-align: center; padding: 1rem;">No entries yet. Be the first to share!</p>';
+                return;
+            }
+
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML = `
+                    <div class="author">${escapeHtml(post.name)}</div>
+                    <div class="timestamp">${post.timestamp}</div>
+                    <div class="content">${escapeHtml(post.content)}</div>
+                `;
+                feedElement.appendChild(postDiv);
+            });
+        }
+
+        // Helper to prevent basic HTML injection
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Share link functionality
+        function shareWebsite() {
+            const currentUrl = window.location.href;
+            navigator.clipboard.writeText(currentUrl).then(() => {
+                alert("Website link copied to clipboard! Send it to your friends.");
+            }).catch(err => {
+                prompt("Copy this link to share with your friends:", currentUrl);
+            });
+        }
+    </script>
+</body>
+</html>
